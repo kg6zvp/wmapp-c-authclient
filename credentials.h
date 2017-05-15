@@ -18,4 +18,14 @@ struct Credentials{
 
 typedef struct Credentials Credentials;
 
+/**
+ * Set the token, freeing any old memory if necessary
+ */
+extern void credentials_set_token(Credentials* credentials, char* token);
+
+/**
+ * Set the token signature, freeing any old memory if necessary
+ */
+extern void credentials_set_token_signature(Credentials* credentials, char* token_signature);
+
 #endif

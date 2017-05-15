@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifndef _objstring_h_
+#define _objstring_h_
+
 struct string {
 	char* ptr;
 	size_t len;
@@ -22,3 +25,5 @@ extern void string_free(ObjString* s);
 extern int string_append(ObjString* s, ObjString* new_data);
 
 extern int cstring_append(ObjString* s, char* append_data, size_t append_len);
+
+#endif

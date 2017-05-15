@@ -1,19 +1,6 @@
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
+#include <terminput.h>
 
-#ifdef _WIN32
-	#include <windows.h>
-#else
-	#include <unistd.h>
-#endif
-
-#define SHOW_INPUT 1
-#define HIDE_INPUT 0
-
-#define INPUT_BUFFER_SZ 16
-
-void err_exit(char* msg){
+void raw_err_exit(char* msg){
 	fprintf(stderr, msg);
 	exit(1);
 }
@@ -65,7 +52,7 @@ char* get_input(char* prompt, int show){
 	char* data = malloc(max_len*sizeof(char));
 
 	if(data == 0) //something went very wrong
-		err_exit("Couldn't allocate memory in terminput.c Exiting...\n");
+		raw_err_exit("Couldn't allocate memory in terminput.c Exiting...\n");
 
 	int i = 0;
 	while(1){ //forever
@@ -81,7 +68,7 @@ char* get_input(char* prompt, int show){
 			max_len += INPUT_BUFFER_SZ;
 			data = realloc(data, max_len*sizeof(char));
 			if(data == 0)
-				err_exit("Couldn't allocate buffer");
+				raw_err_exit("Couldn't allocate buffer");
 		}
 		++i;
 	}
