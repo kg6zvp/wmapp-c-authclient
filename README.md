@@ -1,5 +1,11 @@
 #C Auth SDK
 
-This library currently can only be compiled and linked dynamically.
+This library currently can be compiled and linked statically or dynamically
 
-TODO: Allow static linking
+##Usage
+
+See `sample.c`
+
+##Compiling
+
+See `Makefile` under the following targets: `sample_static`, `sample_dynamic`
