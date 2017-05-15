@@ -150,14 +150,20 @@ struct curl_request* objcurl_new_request(){
 
 void objcurl_free_request(struct curl_request* request){
 	string_free(request->url);
-	string_free(request->body);
-	linkedlist_free(request->request_headers, string_free);
+	if(request->body != NULL){
+		string_free(request->body);
+	}
+	if(request->request_headers != NULL){
+		linkedlist_free(request->request_headers, string_free);
+	}
 	free(request);
 }
 
 void objcurl_free_response(struct curl_response* response){
-	linkedlist_free(response->response_headers, string_free);
-	string_free(response->response_body);
+	if(response->response_headers != NULL)
+		linkedlist_free(response->response_headers, string_free);
+	if(response->response_body != NULL)
+		string_free(response->response_body);
 	free(response);
 }
 
