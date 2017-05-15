@@ -84,7 +84,7 @@ extern int terminal_login();
 /**
  * Save the token and signature to the store (probably something like ~/.config/wmapp/auth)
  */
-extern void persist_credentials();
+extern int persist_credentials();
 
 /**
  * Load the token and signature from the store and into memory

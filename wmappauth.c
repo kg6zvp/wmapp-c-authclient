@@ -106,6 +106,12 @@ int raw_renew_token(){
 	return return_status;
 }
 
+int raw_persist_credentials(){
+	FILE* f = fopen(".config/wmappauth.bin", "w+");
+	fwrite(current_credentials->token, sizeof(char)*(strlen(current_credentials->token)+1), 1, f);
+	fwrite(current_credentials->token_signature, sizeof(char)*(strlen(current_credentials->token_signature)+1), 1, f);
+}
+
 int login(char* username, char* password, char* device_name){
 	if(device_name == NULL){ //If they didn't pass a device name, populate the info
 		device_name = malloc(128*sizeof(char)); //allocate space for 127 characters + null terminator
@@ -117,6 +123,15 @@ int login(char* username, char* password, char* device_name){
 
 int renew_token(){
 	return raw_renew_token();
+}
+
+int persist_credentials(){
+	if(current_credentials == NULL)
+		return 0;
+	if(current_credentials->token == NULL
+			|| current_credentials->token_signature == NULL)
+		return 0;
+	return raw_persist_credentials(); //success?
 }
 
 /**

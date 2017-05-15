@@ -15,5 +15,6 @@ int main(int argc, char** argv){
 	print_creds();
 	renew_token();
 	print_creds();
+	persist_credentials();
 	return 0;
 }
