@@ -35,7 +35,7 @@ char* raw_get_noshow_input(char* prompt){
 			SetConsoleMode(h, mode);
 		}
 
-		fprintf(stderr, "terminput.c doesn't care about Windows support right now.\n");
+		fprintf(stderr, "terminput.c doesn't care about Windows support right now.\n#SorryNotSorry\n");
 		return NULL;
 	#else
 		return getpass(prompt);

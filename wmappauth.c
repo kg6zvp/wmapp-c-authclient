@@ -107,22 +107,84 @@ int raw_renew_token(){
 }
 
 int raw_persist_credentials(){
-	FILE* f = fopen(".config/wmappauth.bin", "w+");
+	ObjString* cred_fname = string_new_with_data(data_dir, 0); //'cause I'm lazy
+	cstring_append(cred_fname, "/wmappauth.bin", 0); //'cause I'm even lazier :P
+
+	FILE* f = fopen(cred_fname->ptr, "w+"); //yee
+	string_free(cred_fname); //at least I did this
+
 	fwrite(current_credentials->token, sizeof(char)*(strlen(current_credentials->token)+1), 1, f);
 	fwrite(current_credentials->token_signature, sizeof(char)*(strlen(current_credentials->token_signature)+1), 1, f);
+	fclose(f); //don't need it anymore, why keep it open?
+	return 1;
+}
+
+int raw_load_credentials(){
+	//TODO: Check if file exists
+	ObjString* cred_fname = string_new_with_data(data_dir, 0); //'cause I'm lazy
+	cstring_append(cred_fname, "/wmappauth.bin", 0); //'cause I'm even lazier :P
+
+	FILE* f = fopen(cred_fname->ptr, "r"); //not including b 'cause we don't care about Windows :'|
+	string_free(cred_fname);
+	if(f){ //exists/readable
+		//
+		struct stat fst;
+		fstat(fileno(f), &fst);
+		long size = fst.st_size;
+		void* temp_store = malloc(size); //allocate enough space to read the whole file (risky, but probably okay!)
+		int n = fread(temp_store, size, 1, f);
+		fclose(f); //we're done with it now (it being the file we were reading data from)
+		
+		/*
+		 * Populate the token variable
+		 */
+		int token_len = strlen((char*)temp_store);
+		char* token = malloc(token_len+1); //create the thing we're storing the token in
+		memcpy(token, temp_store, token_len+1); //we can copy the null terminator because we made the file
+		credentials_set_token(current_credentials, token);
+
+		/*
+		 * Populate the signature variable
+		 */
+		char* signature_temp = temp_store+token_len+1; //add the length of the token plus 1 to move past the NULL terminator
+		int sig_len = strlen((char*)signature_temp); //cast is redundant, but matches
+		char* token_signature = malloc(sig_len+1); //again, copying the null terminator (I know it's risky, shut up)
+		memcpy(token_signature, signature_temp, sig_len+1); //copy the null into it
+		credentials_set_token_signature(current_credentials, token_signature);
+
+		free(temp_store); //free the memory used to store the file data
+	}else{ // :'(
+		return 0; //return bad
+	}
+	return 1;
 }
 
 int login(char* username, char* password, char* device_name){
+	int devmalloc = 0;
 	if(device_name == NULL){ //If they didn't pass a device name, populate the info
+		devmalloc = 1;
 		device_name = malloc(128*sizeof(char)); //allocate space for 127 characters + null terminator
 		gethostname(device_name, 127); //get the hostname from the machine and write it into the buffer
 		device_name[127] = '\0'; //set last one to null just in case
 	}
-	return raw_login(username, password, device_name);
+	int status_code = raw_login(username, password, device_name);
+	if(devmalloc){
+		free(device_name);
+	}
+	return status_code;
 }
 
 int renew_token(){
 	return raw_renew_token();
+}
+
+struct linkedlist* list_tokens(){
+	//Get the tokens from server
+	struct curl_request* request = objcurl_new_request();
+	request->url = string_new_with_data(URL_LIST_TOKENS, 0);
+	raw_add_auth_headers(request);
+	struct curl_response* response = objcurl_perform(request);
+	//TODO: Parse the json and separate the tokens into a list
 }
 
 int persist_credentials(){
@@ -134,6 +196,12 @@ int persist_credentials(){
 	return raw_persist_credentials(); //success?
 }
 
+int load_credentials(){
+	if(current_credentials == NULL)
+		return 0;
+	return raw_load_credentials();
+}
+
 /**
  * Intended for external use
  */
@@ -142,6 +210,8 @@ int terminal_login(){
 	char* username = get_input("Username: ", SHOW_INPUT);
 	char* password = get_input("Password: ", HIDE_INPUT);
 	int response_code = login(username, password, NULL);
+	free(username); //don't need it anymore
+	free(password); //we're done with this, don't need to keep it in memory
 	if(response_code == 200){
 		printf("Login successful!\n");
 	}else if(response_code == 401){
@@ -158,10 +228,55 @@ int terminal_login(){
  * Initialize the library
  */
 void wmappauth_init(){
+	/*
+	 * implement XDG Directory specification (specifies where applications should put cache, data and configuration files for each user)
+	 */
+	char* base_dir = getenv("XDG_DATA_HOME"); //get data directory
+	printf("XDG Env: %s\n", base_dir);
+	if(base_dir == NULL||strlen(base_dir) < 2){ //if it's not defined, but this really shouldn't happen
+		char* home_dir = getenv("HOME");
+		char* append_dir = "/.local/share/";
+		base_dir = malloc(strlen(home_dir)+strlen(append_dir)+1); //should use sizeof(char)
+		memcpy(base_dir, home_dir, strlen(home_dir)); //should use sizeof(char)
+		memcpy(&(base_dir[strlen(home_dir)]), append_dir, strlen(append_dir)); //should use sizeof(char)
+		base_dir[strlen(home_dir)+strlen(append_dir)] = '\0'; //could be a stored value, but oh well
+	}
+	wmappauth_init_dir(base_dir);
+}
+
+void wmappauth_init_dir(char* base_dir){
+	/*
+	 * figure out which directory to use inside the base directory
+	 * (this maybe should go in wmappauth_init() function which takes no args)
+	 */
+	//char* dir_name = "wmappauth";
+	char* dir_name = SERVER_ADDRESS;
+	data_dir = malloc(strlen(base_dir)+strlen(dir_name)+1);
+	memcpy(data_dir, base_dir, strlen(base_dir));
+	memcpy( &(data_dir[strlen(base_dir)]), dir_name, strlen(dir_name));
+	data_dir[strlen(base_dir)+strlen(dir_name)] = '\0';
+
+	printf("data dir: %s\n", data_dir);
+	
+	/*
+	 * Create config directory if necessary (just does it anyway and it will silently fail if it already exists, so cool)
+	 */
+	mkdir(data_dir, 0700); //who cares about windows? ...
+	
 	objcurl_init();
 	current_credentials = malloc(sizeof(Credentials));
 	current_credentials->token = NULL; //in case
 	current_credentials->token_signature = NULL; //in case
+}
+
+void wmappauth_deinit(){
+	free(data_dir); //don't need to keep this around
+	/*
+	 * Free credentials
+	 */
+	free(current_credentials->token);
+	free(current_credentials->token_signature);
+	free(current_credentials);
 }
 
 

@@ -7,6 +7,9 @@
 #include <objstring.h>
 #include <objcurl.h>
 
+#include <sys/stat.h> //for XDG Directory specification
+#include <sys/types.h> //for XDG Directory specification
+
 /**
  * Necessary to use gethostname(char* destination, int max_string_length)
  */
@@ -16,7 +19,6 @@
 	#include <unistd.h>
 #endif
 
-
 /**
  * Begin actual library stuff
  */
@@ -25,11 +27,16 @@
 
 Credentials* current_credentials;
 
+char* data_dir;
+char* config_dir; //in case
+char* cache_dir; //probs not necessary
+
 /**
  * Define urls
  */
 #define HTTP_PROTO "https://"
-#define AUTH_BASE_URL HTTP_PROTO "wmapp.mccollum.enterprises/loginserver/api"
+#define SERVER_ADDRESS "wmapp.mccollum.enterprises"
+#define AUTH_BASE_URL HTTP_PROTO SERVER_ADDRESS "/loginserver/api"
 
 #define AUTH_TOKEN_URL AUTH_BASE_URL "/token"
 
@@ -41,9 +48,19 @@ Credentials* current_credentials;
 #define URL_SUBSCRIBE_TO_INVALIDATION AUTH_TOKEN_URL "/subscribeToInvalidation"
 
 /**
- * Initialize the library
+ * Initialize the library, guessing config directory via XDG
  */
 extern void wmappauth_init();
+
+/**
+ * Initialize the library with the given directory for storing config files
+ */
+extern void wmappauth_init_dir(char* base_dir);
+
+/**
+ * Free memory and prepare for shutdown
+ */
+extern void wmappauth_deinit();
 
 /**
  * Login to the system and store the result in the credential cache
@@ -72,9 +89,9 @@ extern int is_token_valid();
 extern int invalidate_token();
 
 /**
- * List tokens
+ * List the user's outstanding tokens
  */
-extern int list_tokens();
+extern struct linkedlist* list_tokens();
 
 /**
  * Present the user with a login prompt in the terminal and store the result in the credential cache if successful
