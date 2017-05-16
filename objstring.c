@@ -13,9 +13,13 @@ ObjString* string_new(){
 }
 
 void string_init_with_data(ObjString* s, char* data, size_t len){
-	s->len = len;
+	if(len == 0){ //if no length given, count for it
+		s->len = strlen(data);
+	}else{
+		s->len = len;
+	}
 	s->ptr = malloc(s->len+1);
-	memcpy(s->ptr, data, len);
+	memcpy(s->ptr, data, s->len);
 	s->ptr[s->len] = '\0'; //manually zero
 }
 
