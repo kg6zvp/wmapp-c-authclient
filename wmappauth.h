@@ -1,7 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <json.h> //json-c
+
+/*
+ * json-c
+ */
+#include <json.h>
+#include <json_tokener.h> //for parsing
+
+/*
+ * my libraries
+ */
 #include <terminput.h>
 #include <credentials.h>
 #include <objstring.h>
@@ -9,6 +18,12 @@
 
 #include <sys/stat.h> //for XDG Directory specification
 #include <sys/types.h> //for XDG Directory specification
+
+/*
+ * Credential expiration, time stuff
+ */
+#include <time.h>
+#include <math.h>
 
 /**
  * Necessary to use gethostname(char* destination, int max_string_length)
@@ -110,4 +125,15 @@ extern int persist_credentials();
  */
 extern int load_credentials();
 
+/**
+ * Checks if the credentials are expired according to the computer's current date/time
+ *
+ * NOTE: returns 1 if no credentials are present
+ *
+ * @return int: 1 if they are expired, 0 if they are still valid
+ */
+extern int credentials_are_expired();
+
 #endif
+
+

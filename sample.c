@@ -15,6 +15,12 @@ int main(int argc, char** argv){
 		code = terminal_login(); //prompt the user to login, which will save their token and signature in memory
 	//if you want to know what the variable code is, it's the HTTP status returned by the server
 	print_creds();
+	if(credentials_are_expired()){
+		printf("credentials expired\n");
+		code = terminal_login();
+	}else{
+		printf("credentials not expired\n");
+	}
 	renew_token();
 	print_creds();
 	persist_credentials();

@@ -10,10 +10,10 @@ src_h = wmappauth.h
 default: wmappauth.o
 
 sample_static: wmappauth.o
-	$(CC) sample.c $(CFLAGS) $(LDFLAGS) -l:wmappauth.o -lcurl -o sample_static -l:credentials.o -l:objstring.o -l:terminput.o -l:objcurl.o -l:linkedlist.o
+	$(CC) sample.c $(CFLAGS) $(LDFLAGS) -l:wmappauth.o -lcurl -o sample_static -l:credentials.o -l:objstring.o -l:terminput.o -l:objcurl.o -l:linkedlist.o -lm
 
 sample_dynamic: libwmappauth.so
-	$(CC) sample.c $(CFLAGS) $(LDFLAGS) -lwmappauth -lcredentials -lobjstring -lterminput -lobjcurl -llinkedlist -lcurl -o sample_dynamic
+	$(CC) sample.c $(CFLAGS) $(LDFLAGS) -lwmappauth -lcredentials -lobjstring -lterminput -lobjcurl -llinkedlist -lcurl -o sample_dynamic -lm
 
 
 #############

@@ -100,7 +100,7 @@ int raw_renew_token(){
 		fprintf(stderr, "wmappauth %d: %s\n", return_status, response->response_body->ptr);
 	}
 
-	objcurl_free_request(request); //problem?
+	objcurl_free_request(request);
 	objcurl_free_response(response);
 
 	return return_status;
@@ -120,7 +120,6 @@ int raw_persist_credentials(){
 }
 
 int raw_load_credentials(){
-	//TODO: Check if file exists
 	ObjString* cred_fname = string_new_with_data(data_dir, 0); //'cause I'm lazy
 	cstring_append(cred_fname, "/wmappauth.bin", 0); //'cause I'm even lazier :P
 
@@ -225,6 +224,31 @@ int terminal_login(){
 }
 
 /**
+ * Helper function to get the time in milliseconds
+ */
+int64_t raw_get_current_time_millis(){
+	/*struct timespec spec;
+	clock_gettime(CLOCK_REALTIME, &spec);
+	return lround( spec.tv_nsec ); //nano to millis//*/
+	time_t t;
+	time(&t);
+	return t*1000; //get milliseconds
+}
+
+int credentials_are_expired(){
+	json_object* token_object = json_tokener_parse(current_credentials->token);
+	//assume it's type is object (come on! It's 2017)
+	json_object* expirationDate_object = json_object_object_get(token_object, "expirationDate"); //bad to use "magic string," but need to test it
+
+	long time = raw_get_current_time_millis();
+	long expiration_date = json_object_get_int64(expirationDate_object);
+	
+	json_object_put(token_object); //free memory (no idea why it's called put)
+
+	return (time >= expiration_date);
+}
+
+/**
  * Initialize the library
  */
 void wmappauth_init(){
@@ -232,7 +256,6 @@ void wmappauth_init(){
 	 * implement XDG Directory specification (specifies where applications should put cache, data and configuration files for each user)
 	 */
 	char* base_dir = getenv("XDG_DATA_HOME"); //get data directory
-	printf("XDG Env: %s\n", base_dir);
 	if(base_dir == NULL||strlen(base_dir) < 2){ //if it's not defined, but this really shouldn't happen
 		char* home_dir = getenv("HOME");
 		char* append_dir = "/.local/share/";
@@ -256,8 +279,6 @@ void wmappauth_init_dir(char* base_dir){
 	memcpy( &(data_dir[strlen(base_dir)]), dir_name, strlen(dir_name));
 	data_dir[strlen(base_dir)+strlen(dir_name)] = '\0';
 
-	printf("data dir: %s\n", data_dir);
-	
 	/*
 	 * Create config directory if necessary (just does it anyway and it will silently fail if it already exists, so cool)
 	 */
