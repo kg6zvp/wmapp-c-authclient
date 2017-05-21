@@ -1,0 +1,5 @@
+Name: linkedlist
+Description: Simplistic LinkedList implementation designed for one-off stuff
+Version: 1.0.0
+Cflags: -I${includedir}/linkedlist
+Libs: -L${libdir}/linkedlist -llinkedlist

@@ -1,0 +1,6 @@
+Name: objcurl
+Description: Object-oriented libCURL interface for C
+Version: 1.0.0
+Requires: linkedlist objstring libcurl
+Cflags: -I${includedir}/objcurl
+Libs: -L${libdir}/objcurl -lobjcurl

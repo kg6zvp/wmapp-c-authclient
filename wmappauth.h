@@ -18,7 +18,7 @@
 
 #include <sys/stat.h> //for XDG Directory specification
 #include <sys/types.h> //for XDG Directory specification
-#include <errno.h>
+#include <errno.h> //for XDG Directory specification
 
 /*
  * Credential expiration, time stuff
@@ -38,8 +38,8 @@
 /**
  * Begin actual library stuff
  */
-#ifndef _wmappauth_h_
-#define _wmappauth_h_
+#ifndef _mc_auth_h_
+#define _mc_auth_h_
 
 Credentials* current_credentials;
 
@@ -134,6 +134,13 @@ extern int load_credentials();
  * @return int: 1 if they are expired, 0 if they are still valid
  */
 extern int credentials_are_expired();
+
+/**
+ * Emulate Java's System.currentTimeMillis() call
+ *
+ * return int64_t: The number of Milliseconds since the Epoch (not millisecond precise, should be used only for approximations)
+ */
+extern int64_t system_currenttimemillis();
 
 #endif
 

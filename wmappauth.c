@@ -235,6 +235,10 @@ int64_t raw_get_current_time_millis(){
 	return t*1000; //get milliseconds
 }
 
+int64_t system_currenttimemillis(){
+	return raw_get_current_time_millis();
+}
+
 int credentials_are_expired(){
 	json_object* token_object = json_tokener_parse(current_credentials->token);
 	//assume it's type is object (come on! It's 2017)

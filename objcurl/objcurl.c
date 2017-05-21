@@ -12,7 +12,6 @@ int raw_begins_with(char* str, char* pattern){
 
 size_t raw_header_callback(char* buffer, size_t size, size_t nitems, struct curl_response* response){
 	ObjString* header = string_new_with_data(buffer, size*nitems-2); //-2 to get rid of the newline characters
-	//printf("processing header: %s\n", header->ptr);
 	
 	if(response->response_headers == NULL){
 		response->response_headers = linkedlist_new();
@@ -63,7 +62,7 @@ struct curl_response* objcurl_perform(struct curl_request* request){
 	response->response_headers = NULL;
 	response->response_body = string_new();
 	response->status_code = -1; //nothing yet
-
+	
 	CURL* hnd = curl_easy_init();
 	
 	curl_easy_setopt(hnd, CURLOPT_URL, request->url->ptr);
@@ -100,6 +99,7 @@ struct curl_response* objcurl_perform(struct curl_request* request){
 	}
 	curl_easy_getinfo(hnd, CURLINFO_RESPONSE_CODE, &(response->status_code)); //set the response code
 
+	curl_easy_cleanup(hnd);
 	return response;
 }
 

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h> //for error message
 #include <string.h>
 #include <objstring.h>
 #include <curl/curl.h>

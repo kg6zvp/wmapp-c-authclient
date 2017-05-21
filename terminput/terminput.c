@@ -38,7 +38,11 @@ char* raw_get_noshow_input(char* prompt){
 		fprintf(stderr, "terminput.c doesn't care about Windows support right now.\n#SorryNotSorry\n");
 		return NULL;
 	#else
-		return getpass(prompt);
+		char* tmp = getpass(prompt); //trying to free this memory can cause problems
+		char* userinput = malloc(sizeof(char)*strlen(tmp+1)); //allocate memory to copy into.
+		memcpy(userinput, tmp, strlen(tmp));
+		userinput[strlen(tmp)] = '\0';
+		return userinput;
 	#endif
 }
 
@@ -52,7 +56,7 @@ char* get_input(char* prompt, int show){
 	char* data = malloc(max_len*sizeof(char));
 
 	if(data == 0) //something went very wrong
-		raw_err_exit("Couldn't allocate memory in terminput.c Exiting...\n");
+		raw_err_exit("Couldn't allocate memory in terminput.c:52 Exiting...\n");
 
 	int i = 0;
 	while(1){ //forever
@@ -68,7 +72,7 @@ char* get_input(char* prompt, int show){
 			max_len += INPUT_BUFFER_SZ;
 			data = realloc(data, max_len*sizeof(char));
 			if(data == 0)
-				raw_err_exit("Couldn't allocate buffer");
+				raw_err_exit("Couldn't allocate buffer (terminput.c:69)");
 		}
 		++i;
 	}

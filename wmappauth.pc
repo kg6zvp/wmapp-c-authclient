@@ -1,0 +1,11 @@
+includedir="/usr/include/mccollum/mc_auth"
+#libdir="/usr/lib"
+libdir="/usr/lib64"
+
+Name: wmappauth
+Description: Authentication and Authorization client for Westmont accounts for C
+Version: 1.0.0
+Requires: credentials objstring linkedlist
+Requires.private: terminput json-c objcurl
+Cflags: -I${includedir}/wmappauth
+Libs: -L${libdir}/wmappauth -lwmappauth
