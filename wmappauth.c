@@ -267,6 +267,36 @@ void wmappauth_init(){
 	wmappauth_init_dir(base_dir);
 }
 
+int raw_mkpath(const char *s, mode_t mode){
+	char *q, *r = NULL, *path = NULL, *up = NULL;
+	int rv;
+
+	rv = -1;
+	if (strcmp(s, ".") == 0 || strcmp(s, "/") == 0)
+		return (0);
+	if ((path = strdup(s)) == NULL)
+		goto out;
+	if ((q = strdup(s)) == NULL)
+		goto out;
+	if ((r = dirname(q)) == NULL)
+		goto out;
+	if ((up = strdup(r)) == NULL)
+		goto out;
+	if ((raw_mkpath(up, mode) == -1) && (errno != EEXIST))
+		goto out;
+	if ((mkdir(path, mode) == -1) && (errno != EEXIST))
+		rv = -1;
+	else
+		rv = 0;
+
+out:
+	if (up != NULL)
+		free(up);
+	free(q);
+	free(path);
+	return (rv);
+}
+
 void wmappauth_init_dir(char* base_dir){
 	/*
 	 * figure out which directory to use inside the base directory
@@ -282,7 +312,7 @@ void wmappauth_init_dir(char* base_dir){
 	/*
 	 * Create config directory if necessary (just does it anyway and it will silently fail if it already exists, so cool)
 	 */
-	mkdir(data_dir, 0700); //who cares about windows? ...
+	raw_mkpath(data_dir, 0700);
 	
 	objcurl_init();
 	current_credentials = malloc(sizeof(Credentials));
