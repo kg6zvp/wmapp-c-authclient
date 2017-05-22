@@ -9,7 +9,8 @@ char* raw_mk_json_credenials(char* username, char* password, char* device_name){
 	struct json_object* creds = json_object_new_object();
 	json_object_object_add(creds, "username", json_object_new_string(username));
 	json_object_object_add(creds, "password", json_object_new_string(password));
-	json_object_object_add(creds, "devicename", json_object_new_string(device_name));
+	if(device_name != NULL)
+		json_object_object_add(creds, "devicename", json_object_new_string(device_name));
 	return json_object_to_json_string_ext(creds, JSON_C_TO_STRING_PLAIN);
 }
 
@@ -184,6 +185,7 @@ struct linkedlist* list_tokens(){
 	raw_add_auth_headers(request);
 	struct curl_response* response = objcurl_perform(request);
 	//TODO: Parse the json and separate the tokens into a list
+	return NULL;
 }
 
 int persist_credentials(){
@@ -301,6 +303,45 @@ out:
 	return (rv);
 }
 
+int raw_update_user_info(char* username, char* password){
+	char* cred_json = raw_mk_json_credenials(username, password, NULL);
+
+	struct curl_request* request = objcurl_new_request();
+	request->request_method = HTTP_POST;
+	request->url = string_new_with_data(URL_USER_UPDATE_DATABASE, 0);
+	request->body = string_new_with_data(cred_json, 0);
+	free(cred_json);
+	objcurl_add_request_header(request, string_new_with_data("Content-Type: application/json", 30));
+	objcurl_add_request_header(request, string_new_with_data("Acceps: application/json", 24));
+
+	struct curl_response* response = objcurl_perform(request);
+
+	if(response->status_code == 200){
+		printf("Received response: %s\n", response->response_body->ptr);
+		objcurl_free_request(request);
+		objcurl_free_response(response);
+		return 1;
+	}
+	printf("Received status code: %d\nand response: %s\n", response->status_code, response->response_body->ptr);
+	return 0;
+}
+
+/**
+ * Right now it doesn't do anything special other than pass the work along to the function for internal use, but it may become important later
+ */
+int update_user_info(char* username, char* password){
+	return raw_update_user_info(username, password);
+}
+
+int terminal_update_user_info(){
+	char* username = get_input("Username: ", SHOW_INPUT);
+	char* password = get_input("Password: ", HIDE_INPUT);
+	int code = update_user_info(username, password);
+	free(username);
+	free(password);
+	return code;
+}
+
 void wmappauth_init_dir(char* base_dir){
 	/*
 	 * figure out which directory to use inside the base directory
@@ -319,9 +360,7 @@ void wmappauth_init_dir(char* base_dir){
 	raw_mkpath(data_dir, 0700);
 	
 	objcurl_init();
-	current_credentials = malloc(sizeof(Credentials));
-	current_credentials->token = NULL; //in case
-	current_credentials->token_signature = NULL; //in case
+	current_credentials = credentials_new();
 }
 
 void wmappauth_deinit(){
@@ -329,9 +368,7 @@ void wmappauth_deinit(){
 	/*
 	 * Free credentials
 	 */
-	free(current_credentials->token);
-	free(current_credentials->token_signature);
-	free(current_credentials);
+	credentials_free(current_credentials);
 }
 
 

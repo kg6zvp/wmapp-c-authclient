@@ -54,6 +54,9 @@ char* cache_dir; //probs not necessary
 #define SERVER_ADDRESS "wmapp.mccollum.enterprises"
 #define AUTH_BASE_URL HTTP_PROTO SERVER_ADDRESS "/loginserver/api"
 
+/**
+ * URLs for authentication and authorization
+ */
 #define AUTH_TOKEN_URL AUTH_BASE_URL "/token"
 
 #define URL_GET_TOKEN AUTH_TOKEN_URL "/getToken"
@@ -62,6 +65,14 @@ char* cache_dir; //probs not necessary
 #define URL_INVALIDATE_TOKEN AUTH_TOKEN_URL "/invalidateToken/%d"
 #define URL_LIST_TOKENS AUTH_TOKEN_URL "/listTokens"
 #define URL_SUBSCRIBE_TO_INVALIDATION AUTH_TOKEN_URL "/subscribeToInvalidation"
+
+/**
+ * URLs for retrieving user information
+ */
+#define USER_BASE_URL AUTH_BASE_URL "/user"
+
+#define URL_USER_GET_INFO USER_BASE_URL
+#define URL_USER_UPDATE_DATABASE USER_BASE_URL
 
 /**
  * Initialize the library, guessing config directory via XDG
@@ -134,6 +145,20 @@ extern int load_credentials();
  * @return int: 1 if they are expired, 0 if they are still valid
  */
 extern int credentials_are_expired();
+
+/**
+ * Updates the user information stored on the server
+ *
+ * @return int: 0 or 1 indicating success or failure (0 will usualy be because of incorrect username/password
+ */
+extern int update_user_info(char* username, char* password);
+
+/**
+ * Prompt the user for their username and password in the terminal and perform the update
+ *
+ * @return int: 0 or 1 indicating success or failure (0 will usualy be because of incorrect username/password
+ */
+extern int terminal_update_user_info();
 
 /**
  * Emulate Java's System.currentTimeMillis() call

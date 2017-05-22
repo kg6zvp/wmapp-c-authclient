@@ -28,4 +28,10 @@ extern void credentials_set_token(Credentials* credentials, char* token);
  */
 extern void credentials_set_token_signature(Credentials* credentials, char* token_signature);
 
+extern void credentials_init(Credentials* creds);
+
+extern Credentials* credentials_new();
+
+extern void credentials_free(Credentials* creds);
+
 #endif
