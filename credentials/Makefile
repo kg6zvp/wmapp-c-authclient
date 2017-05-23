@@ -20,5 +20,8 @@ libcredentials.a: credentials.o
 libcredentials.so: credentials.o
 	$(CC) -I"." -shared credentials.o -o libcredentials.so
 
+install: libcredentials.a libcredentials.so credentials.o credentials.h
+	#TODO
+
 clean:
 	$(RM) *.o *.so *.a

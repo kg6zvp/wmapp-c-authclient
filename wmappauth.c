@@ -371,4 +371,35 @@ void wmappauth_deinit(){
 	credentials_free(current_credentials);
 }
 
+Credentials* get_current_credentials(){
+	return current_credentials;
+}
+
+void set_current_credentials(Credentials* creds){
+	current_credentials=creds;
+}
+
+struct curl_response* perform_request(struct curl_request* request){
+	return perform_credential_request(current_credentials, request);
+}
+
+struct curl_response* perform_credential_request(Credentials* creds, struct curl_request* request){
+	/**
+	 * Add token header
+	 */
+	ObjString* token_header = string_new_with_data(TOKEN_HEADER, 0);
+	cstring_append(token_header, ": ", 2);
+	cstring_append(token_header, creds->token, 0);
+	objcurl_add_request_header(request, token_header);
+
+	/**
+	 * Add signature header
+	 */
+	ObjString* signature_header = string_new_with_data(SIGNATURE_HEADER, 0);
+	cstring_append(signature_header, ": ", 2);
+	cstring_append(signature_header, creds->token_signature, 0);
+	objcurl_add_request_header(request, signature_header);
+
+	return objcurl_perform(request);
+}
 

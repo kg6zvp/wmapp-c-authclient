@@ -1,3 +1,11 @@
+---
+header-includes:
+- \usepackage{listings}
+- \lstset{breaklines=true}
+- \lstset{prebreak=,}
+- \lstset{postbreak=,}
+---
+
 #C Auth SDK
 
 This library currently can be compiled and linked statically or dynamically
@@ -127,6 +135,110 @@ void my_func(...){
 	if(credentials_are_expired()){ //if the credentials are expired, present a login prompt
 		terminal_login();
 	}
+}
+```
+
+###Get the credentials
+
+Use cases include allowing multiple people to use your application and swap out who is signed in currently
+
+In case you want to use the credentials to perform a curl request manually, or to somehow login over a regular UNIX socket with a special server you wrote, use this function:
+
+```{.c}
+Credentials* creds = get_current_credentials();
+```
+
+###Set the credentials
+
+In case you want to swap out who the library is currently using to perform requests, set the current credentials with this function (Note: you should probably get them first and save them somewhere, otherwise you will create a memory leak)
+
+```{.c}
+set_current_credentials(creds);
+```
+
+###Perform an HTTP/HTTPS Request
+
+Perform an HTTP/HTTPS request using the objcurl library, adding in the required auth headers and, optionally, specify a set of credentials you wish to use for the request.
+
+####Specify credentials
+This is what it looks like to specify credentials
+
+~~~~ {.c .numberLines}
+#include <wmappauth.h>
+...
+void do_something(...){
+	/**
+	 * Grab the credentials from the auth library
+	 */
+	Credentials* creds = get_current_credentials();
+
+	/**
+	 * Perform login as a new user
+	 */
+	set_current_credentials(NULL); //we've got a reference to the old user's credentials, don't need to keep these around anymore
+	terminal_login(); //do login
+
+	/**
+	 * Construct a request using objcurl
+	 */
+	struct curl_request* request = objcurl_new_request();
+	request->request_method = HTTP_POST;
+	request->url = string_new_with_data("https://wmapp.mccollum.enterprises/shuttle/api/routes", 0);
+	//request->body = string_new_with_data("{\"name\":\"My new Shuttle route\"}", 0);
+	objcurl_add_request_header(request, string_new_with_data("Content-Type: application/json", 0));
+	objcurl_add_request_header(request, string_new_with_data("Accept: application/json", 24)); //the 24 is specifying the length of the string, but can be replaced with 0 to automatically figure it out
+
+	/**
+	 * Perform the request, specifying to use the old credentials of whoever was logged in previously (not really sure why you'd want this)
+	 */
+	struct curl_response* response = perform_credential_request(credentials, request);
+	objcurl_free_request(request); //memory should be freed after
+	
+	/**
+	 * Print out the HTTP response code and the message sent by the server
+	 */
+	printf("Response code: %d\n", response->status_code);
+	printf("Response body: %d\n", response->response_body->ptr); //->ptr is added because the body is of type ObjString*; see objcurl.h for a detailed look at the curl_response struct
+
+	objcurl_free_response(response); //free response now that we don't need it anymore
+}
+~~~~
+
+####Don't specify Credentials
+This will use whatever credentials were used for login
+
+``` {.c .numberLines}
+#include <wmappauth.h>
+...
+void do_something(...){
+	/**
+	 * Perform login (included for sake of clarity because this should have been done at program start or something)
+	 */
+	terminal_login(); //do login
+
+	/**
+	 * Construct a request using objcurl
+	 */
+	struct curl_request* request = objcurl_new_request();
+	request->request_method = HTTP_POST;
+	request->url = string_new_with_data("https://wmapp.mccollum.enterprises/shuttle/api/routes", 0);
+	//request->body = string_new_with_data("{\"name\":\"My new Shuttle route\"}", 0); //post json for a new shuttle route with the name 'My new Shuttle route'
+	objcurl_add_request_header(request, string_new_with_data("Content-Type: application/json", 0)); //tell the server we're using json
+	objcurl_add_request_header(request, string_new_with_data("Accept: application/json", 24)); //Tell the server we want json; the 24 is specifying the length of the string, but can be replaced with 0 to automatically figure it out
+
+	/**
+	 * Perform the request and the credentials of the signed in user will be added automagically
+	 */
+	struct curl_response* response = perform_credential_request(credentials, request);
+	objcurl_free_request(request); //memory should be freed as soon as it is no longer needed
+	
+	/**
+	 * Print out the HTTP response code and the message sent by the server
+	 */
+	printf("Response code: %d\n", response->status_code);
+	printf("Response body: %d\n", response->response_body->ptr); //->ptr is added because the body is of type ObjString*; see objcurl.h for a detailed look at the curl_response struct
+
+	objcurl_free_response(response); //free response now that we don't need it anymore
 }
 ```
 

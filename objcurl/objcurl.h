@@ -20,6 +20,7 @@ struct curl_request{
 	ObjString* url;
 	LinkedList* request_headers; //ObjString*
 	ObjString* body; //if there is one, may not be printable characters
+	//TODO: Add NULLable function pointers for parsing headers and/or reading message body. If these are included, we can disregard returning the headers or body in the response
 };
 
 struct curl_response{
