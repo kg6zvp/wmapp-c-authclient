@@ -3,13 +3,15 @@ CC=gcc
 lib32pfx="/usr/lib"
 lib64pfx="/usr/lib64"
 includepfx="/usr/include"
-libSuffix="mccollum/linkedlist"
+libSuffix="mccollum"
 
 lib64dir="$(lib64pfx)/$(libSuffix)"
 includedir="$(includepfx)/$(libSuffix)"
 
 # Default to dynamically linked library
 default: dynamic
+
+all: dynamic static
 
 #make it clear that it's the static version
 static: liblinkedlist.a
@@ -38,9 +40,7 @@ install: liblinkedlist.a liblinkedlist.so linkedlist.h mc_linkedlist.pc
 	cp liblinkedlist.so "$(lib64dir)/"
 	cp mc_linkedlist.pc "/usr/lib64/pkgconfig/"
 
-uninstall: "$(lib64dir)/liblinkedlist.a" "$(lib64dir)/liblinkedlist.so" "$(includedir)/linkedlist.h" "/usr/lib64/pkgconfig/mc_linkedlist.pc"
-	rm -rf "$(lib64dir)"
-	rm -rf "$(includedir)"
+uninstall:
 	$(RM) "$(lib64dir)/liblinkedlist.a" "$(lib64dir)/liblinkedlist.so" "$(includedir)/linkedlist.h" "/usr/lib64/pkgconfig/mc_linkedlist.pc"
 
 clean:

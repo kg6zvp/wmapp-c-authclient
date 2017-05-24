@@ -5,8 +5,8 @@ libSuffix="mccollum"
 includedir="${includepfx}/${libSuffix}"
 libdir="${lib64pfx}/${libSuffix}"
 
-Name: mc_linkedlist
-Description: Simplistic LinkedList implementation designed for one-off stuff
+Name: mc_objstring
+Description: Simplistic resizable container primarily designed to hold null-terminated character strings (char arrays)
 Version: 1.0.0
 Cflags: -I${includedir}
-Libs: -L${libdir} -llinkedlist
+Libs: -L${libdir} -lobjstring

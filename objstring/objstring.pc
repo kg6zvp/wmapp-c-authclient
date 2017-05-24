@@ -1,5 +1,0 @@
-Name: objstring
-Description: Simplistic resizable container primarily designed to hold null-terminated character strings (char arrays)
-Version: 1.0.0
-Cflags: -I${includedir}/objstring
-Libs: -L${libdir}/objstring -lobjstring

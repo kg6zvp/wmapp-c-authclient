@@ -5,8 +5,8 @@ libSuffix="mccollum"
 includedir="${includepfx}/${libSuffix}"
 libdir="${lib64pfx}/${libSuffix}"
 
-Name: mc_linkedlist
-Description: Simplistic LinkedList implementation designed for one-off stuff
+Name: mc_terminput
+Description: Simplistic terminal input library designed to handle passwords and input strings of arbitrary length
 Version: 1.0.0
 Cflags: -I${includedir}
-Libs: -L${libdir} -llinkedlist
+Libs: -L${libdir} -lterminput
