@@ -1,0 +1,14 @@
+lib64pfx="/usr/lib64"
+includepfx="/usr/include"
+libSuffix="mccollum"
+
+includedir="${includepfx}/${libSuffix}"
+libdir="${lib64pfx}/${libSuffix}"
+
+Name: mc_wmappauth
+Description: Authentication and Authorization client for Westmont accounts for C
+Version: 1.0.0
+Requires: mc_credentials mc_objstring mc_linkedlist mc_objcurl
+Requires.private: mc_terminput json-c
+Cflags: -I${includedir}
+Libs: -L${libdir} -lwmappauth

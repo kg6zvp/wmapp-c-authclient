@@ -22,16 +22,18 @@ libcredentials.a: credentials.o
 libcredentials.so: credentials.o
 	$(CC) -I"." -shared credentials.o -o libcredentials.so
 
-install: libcredentials.a libcredentials.so credentials.o credentials.h mc_credentials.pc
+install: libcredentials.a libcredentials.so credentials.o credentials.h mc_credentials.pc mc_credentials_static.pc
 	mkdir -p "/usr/lib64/mccollum"
 	mkdir -p "/usr/include/mccollum"
 	cp credentials.h /usr/include/mccollum/
 	cp libcredentials.a /usr/lib64/mccollum/
+	cp credentials.o /usr/lib64/mccollum/
 	cp libcredentials.so /usr/lib64/mccollum/
 	cp mc_credentials.pc /usr/lib64/pkgconfig/
+	cp mc_credentials_static.pc /usr/lib64/pkgconfig/
 
 uninstall:
-	$(RM) /usr/lib64/mccollum/libcredentials.a /usr/lib64/mccollum/libcredentials.so /usr/lib64/pkgconfig/mc_credentials.pc /usr/include/mccollum/credentials.h
+	$(RM) /usr/lib64/mccollum/libcredentials.a /usr/lib64/mccollum/credentials.o /usr/lib64/mccollum/libcredentials.so /usr/lib64/pkgconfig/mc_credentials.pc /usr/include/mccollum/credentials.h /usr/lib64/pkgconfig/mc_credentials_static.pc
 
 clean:
 	$(RM) *.o *.so *.a

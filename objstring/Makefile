@@ -32,16 +32,18 @@ libobjstring.a: objstring.o
 libobjstring.so: objstring.o
 	$(CC) -I"." -shared objstring.o -o libobjstring.so
 
-install: libobjstring.a libobjstring.so objstring.h mc_objstring.pc
+install: libobjstring.a libobjstring.a libobjstring.so objstring.h mc_objstring.pc mc_objstring_static.pc
 	mkdir -p "$(lib64dir)"
 	mkdir -p "$(includedir)"
 	cp objstring.h "$(includedir)/"
 	cp libobjstring.a "$(lib64dir)/"
+	cp objstring.o "$(lib64dir)/"
 	cp libobjstring.so "$(lib64dir)/"
 	cp mc_objstring.pc "/usr/lib64/pkgconfig/"
+	cp mc_objstring_static.pc "/usr/lib64/pkgconfig/"
 
 uninstall:
-	$(RM) "$(lib64dir)/libobjstring.a" "$(lib64dir)/libobjstring.so" "$(includedir)/objstring.h" "/usr/lib64/pkgconfig/mc_objstring.pc"
+	$(RM) "$(lib64dir)/libobjstring.a" "$(lib64dir)/objstring.o" "$(lib64dir)/libobjstring.so" "$(includedir)/objstring.h" "/usr/lib64/pkgconfig/mc_objstring.pc" "/usr/lib64/pkgconfig/mc_objstring_static.pc"
 
 clean:
 	$(RM) *.o *.so *.a

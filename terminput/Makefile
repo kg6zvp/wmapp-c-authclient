@@ -32,16 +32,18 @@ libterminput.a: terminput.o
 libterminput.so: terminput.o
 	$(CC) -I"." -shared terminput.o -o libterminput.so
 
-install: libterminput.a libterminput.so terminput.h mc_terminput.pc
+install: libterminput.a terminput.o libterminput.so terminput.h mc_terminput.pc mc_terminput_static.pc
 	mkdir -p "$(lib64dir)"
 	mkdir -p "$(includedir)"
 	cp terminput.h "$(includedir)/"
 	cp libterminput.a "$(lib64dir)/"
+	cp terminput.o "$(lib64dir)/"
 	cp libterminput.so "$(lib64dir)/"
 	cp mc_terminput.pc "/usr/lib64/pkgconfig/"
+	cp mc_terminput_static.pc "/usr/lib64/pkgconfig/"
 
 uninstall:
-	$(RM) "$(lib64dir)/libterminput.a" "$(lib64dir)/libterminput.so" "$(includedir)/terminput.h" "/usr/lib64/pkgconfig/mc_terminput.pc"
+	$(RM) "$(lib64dir)/libterminput.a" "$(lib64dir)/terminput.o" "$(lib64dir)/libterminput.so" "$(includedir)/terminput.h" "/usr/lib64/pkgconfig/mc_terminput.pc" "/usr/lib64/pkgconfig/mc_terminput_static.pc"
 
 clean:
 	$(RM) *.o *.so

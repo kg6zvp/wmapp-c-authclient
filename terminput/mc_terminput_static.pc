@@ -5,9 +5,8 @@ libSuffix="mccollum"
 includedir="${includepfx}/${libSuffix}"
 libdir="${lib64pfx}/${libSuffix}"
 
-Name: mc_objcurl
-Description: Object-oriented libCURL interface for C
+Name: mc_terminput_static
+Description: Simplistic terminal input library designed to handle passwords and input strings of arbitrary length
 Version: 1.0.0
-Requires: mc_linkedlist mc_objstring
 Cflags: -I${includedir}
-Libs: -L${libdir} -lobjcurl -lcurl
+Libs: -L${libdir} -l:terminput.o

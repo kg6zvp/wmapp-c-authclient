@@ -19,6 +19,7 @@
 #include <sys/stat.h> //for XDG Directory specification
 #include <sys/types.h> //for XDG Directory specification
 #include <errno.h> //for XDG Directory specification
+#include <libgen.h>
 
 /*
  * Credential expiration, time stuff

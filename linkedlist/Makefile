@@ -32,16 +32,18 @@ liblinkedlist.a: linkedlist.o
 liblinkedlist.so: linkedlist.o
 	$(CC) -I"." -shared linkedlist.o -o liblinkedlist.so
 
-install: liblinkedlist.a liblinkedlist.so linkedlist.h mc_linkedlist.pc
+install: liblinkedlist.a linkedlist.o liblinkedlist.so linkedlist.h mc_linkedlist.pc mc_linkedlist_static.pc
 	mkdir -p "$(lib64dir)"
 	mkdir -p "$(includedir)"
 	cp linkedlist.h "$(includedir)/"
 	cp liblinkedlist.a "$(lib64dir)/"
+	cp linkedlist.o "$(lib64dir)/"
 	cp liblinkedlist.so "$(lib64dir)/"
 	cp mc_linkedlist.pc "/usr/lib64/pkgconfig/"
+	cp mc_linkedlist_static.pc "/usr/lib64/pkgconfig/"
 
 uninstall:
-	$(RM) "$(lib64dir)/liblinkedlist.a" "$(lib64dir)/liblinkedlist.so" "$(includedir)/linkedlist.h" "/usr/lib64/pkgconfig/mc_linkedlist.pc"
+	$(RM) "$(lib64dir)/liblinkedlist.a" "$(lib64dir)/linkedlist.o" "$(lib64dir)/liblinkedlist.so" "$(includedir)/linkedlist.h" "/usr/lib64/pkgconfig/mc_linkedlist.pc" "/usr/lib64/pkgconfig/mc_linkedlist_static.pc"
 
 clean:
 	$(RM) *.o *.so *.a

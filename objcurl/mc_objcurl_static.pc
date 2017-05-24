@@ -5,9 +5,9 @@ libSuffix="mccollum"
 includedir="${includepfx}/${libSuffix}"
 libdir="${lib64pfx}/${libSuffix}"
 
-Name: mc_objcurl
+Name: mc_objcurl_static
 Description: Object-oriented libCURL interface for C
 Version: 1.0.0
-Requires: mc_linkedlist mc_objstring
+Requires: mc_linkedlist_static mc_objstring_static
 Cflags: -I${includedir}
-Libs: -L${libdir} -lobjcurl -lcurl
+Libs: -L${libdir} -l:objcurl.o -lcurl

@@ -38,16 +38,18 @@ libobjcurl.a: objcurl.o
 libobjcurl.so: objcurl.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -I"." -shared objcurl.o -o libobjcurl.so
 
-install: libobjcurl.a libobjcurl.so objcurl.h mc_objcurl.pc
+install: libobjcurl.a objcurl.o libobjcurl.so objcurl.h mc_objcurl.pc mc_objcurl_static.pc
 	mkdir -p "$(lib64dir)"
 	mkdir -p "$(includedir)"
 	cp objcurl.h "$(includedir)/"
 	cp libobjcurl.a "$(lib64dir)/"
+	cp objcurl.o "$(lib64dir)/"
 	cp libobjcurl.so "$(lib64dir)/"
 	cp mc_objcurl.pc "/usr/lib64/pkgconfig/"
+	cp mc_objcurl_static.pc "/usr/lib64/pkgconfig/"
 
 uninstall:
-	$(RM) "$(lib64dir)/libobjcurl.a" "$(lib64dir)/libobjcurl.so" "$(includedir)/objcurl.h" "/usr/lib64/pkgconfig/mc_objcurl.pc"
+	$(RM) "$(lib64dir)/libobjcurl.a" "$(lib64dir)/objcurl.o" "$(lib64dir)/libobjcurl.so" "$(includedir)/objcurl.h" "/usr/lib64/pkgconfig/mc_objcurl.pc" "/usr/lib64/pkgconfig/mc_objcurl_static.pc"
 
 clean:
 	$(RM) *.so *.o *.a
