@@ -1,0 +1,12 @@
+lib64pfx="/usr/lib64"
+includepfx="/usr/include"
+libSuffix="mccollum/linkedlist"
+
+includedir="${includepfx}/${libSuffix}"
+libdir="${lib64pfx}/${libSuffix}"
+
+Name: mc_linkedlist
+Description: Simplistic LinkedList implementation designed for one-off stuff
+Version: 1.0.0
+Cflags: -I${includedir}
+Libs: -L${libdir} -llinkedlist
