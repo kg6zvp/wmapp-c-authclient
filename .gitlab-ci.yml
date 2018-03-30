@@ -1,0 +1,41 @@
+image: 'gcc:latest'
+
+before_script:
+  - apt-get update && apt-get install -y git libjson-c-dev
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - ./make_all.sh
+  artifacts:
+    paths:
+      - /*.a
+    expire_in: 1 week
+
+test:
+  stage: test
+  script:
+    - ./make_all.sh
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Run dep script here"
+    - git clone "$CI_REPOSITORY_URL" wmapp-c-authclient
+    - cd wmapp-c-authclient
+    - git config user.email "kg6zvp@gmail.com"
+    - git config --global user.name "Sam McCollum"
+    - git remote add github "https://kg6zvp:$GITHUB_PERSONAL_ACCESS_TOKEN@github.com/kg6zvp/wmapp-c-authclient.git"
+    - git push --force --follow-tags github master
+    - cd ..
+    - rm -rf wmapp-c-authclient
+  only:
+    - master
+
+after_script:
+  - echo "End CI"

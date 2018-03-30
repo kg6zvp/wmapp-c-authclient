@@ -46,5 +46,5 @@ uninstall:
 	$(RM) "$(lib64dir)/libterminput.a" "$(lib64dir)/terminput.o" "$(lib64dir)/libterminput.so" "$(includedir)/terminput.h" "/usr/lib64/pkgconfig/mc_terminput.pc" "/usr/lib64/pkgconfig/mc_terminput_static.pc"
 
 clean:
-	$(RM) *.o *.so
+	$(RM) *.o *.so *.a
 

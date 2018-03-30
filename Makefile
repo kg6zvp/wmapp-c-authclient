@@ -41,7 +41,7 @@ libwmappauth.so: wmappauth.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared wmappauth.o -o libwmappauth.so
 
 prepare:
-	sudo dnf install libcurl-devel
+	sudo dnf install libcurl-devel json-c-devel
 
 install: libwmappauth.a wmappauth.o libwmappauth.so wmappauth.h mc_wmappauth.pc mc_wmappauth_static.pc
 	mkdir -p "$(lib64dir)"
